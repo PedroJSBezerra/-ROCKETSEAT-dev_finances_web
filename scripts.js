@@ -1,3 +1,4 @@
+// Abre e fecha o Modal
 const Modal = {
     open(){
       document.querySelector('.modal-overlay').classList.add('active')
@@ -6,7 +7,7 @@ const Modal = {
       document.querySelector('.modal-overlay').classList.remove('active')
     }
 }
-
+// Guarda adiciona e remove dados
 const Transaction = {
     all: [
         {
@@ -28,7 +29,7 @@ const Transaction = {
             description: 'App',
             amount: 200000,
             date: '23/01/2021'
-        }
+        },
     ],
 
     add(transaction){
@@ -46,7 +47,7 @@ const Transaction = {
     incomes(){
         let income = 0
 
-        transactions.forEach(transaction => {
+        Transaction.all.forEach(transaction => {
             if(transaction.amount > 0){
                 income += transaction.amount
             }
@@ -58,7 +59,7 @@ const Transaction = {
     expenses(){
         let expense = 0
 
-        transactions.forEach(transaction => {
+        Transaction.all.forEach(transaction => {
             if(transaction.amount < 0){
                 expense += transaction.amount
             }
@@ -71,7 +72,7 @@ const Transaction = {
         return Transaction.incomes() + Transaction.expenses()
     }
 }
-
+// Substitui/Adiciona elementos no DOM
 const DOM = {
     transactionsContainer: document.querySelector('#data-table tbody'),
 
@@ -117,8 +118,12 @@ const DOM = {
     }
 
 }
-
+// Formatações de moeda ex: -R$ 7.000,00
 const Utils = {
+    formatAmount(value){
+        value = Number(value) * 100
+        console.log(value)
+    },
     formatCurrency(value){
         const signal = Number(value) < 0 ? "-" : ""
 
@@ -134,13 +139,46 @@ const Utils = {
         return signal + value
     }
 }
-
+// Recebe os dados do formulario
 const Form = {
-    submit(event){
-        console.log(event)
-    }
-}
+    description: document.querySelector('input#description'),
+    amount: document.querySelector('input#amount'),
+    date: document.querySelector('input#date'),
 
+    getValues(){
+        return{
+            description: Form.description.value,
+            amount: Form.amount.value,
+            date: Form.date.value
+        }
+    },
+
+    validateFields(){
+        const { description, amount, date} = Form.getValues()
+        
+        if(description.trim() === "" || amount.trim() === "" || date.trim() ===""){
+                throw new Error("Por favor, peencha todos os campos.")
+            }
+    },
+    formatValues(){
+        let {description ,amount , date} = Form.getValues()
+
+        amount = Utils.formatAmount(amount)
+    },
+
+    submit(event){
+        event.preventDefault()
+
+        try{
+            //Form.validateFields()
+            Form.formatValues()
+        } catch(error){
+            alert(error.message)
+        }
+
+        }
+}
+// Inicia e reinicia quando dados sao alterados
 const App = {
     init(){
         Transaction.all.forEach(transaction => {
@@ -155,5 +193,5 @@ const App = {
         App.init()
     }
 }
-
+// Chama a função App.init()
 App.init()
